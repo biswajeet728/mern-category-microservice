@@ -7,6 +7,7 @@ import {
   verify,
 } from "jsonwebtoken";
 import { Config } from "../config";
+import { Roles } from "../services/userTypes";
 
 declare global {
   namespace Express {
@@ -69,8 +70,7 @@ export const authenticate: RequestHandler = async (req, res, next) => {
 };
 
 export const adminOnly: RequestHandler = (req, res, next) => {
-  console.log("User: ", req.user);
-  if (req.user.role !== "admin") {
+  if (req.user.role !== Roles.ADMIN) {
     throw createHttpError(403, "Forbidden: Admin access required");
   }
 
