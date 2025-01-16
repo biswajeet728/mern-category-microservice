@@ -9,9 +9,9 @@
     "build": "tsc"
   },
   "keywords": [],
-  "author": "",
+  "author": "Biswajeet Dash",
   "license": "ISC",
-  "description": "",
+  "description": "Microserice Architecture Based Category Service using Mern Stack ",
   "dependencies": {
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
