@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import Category from "./category-model";
 import logger from "../config/logger";
 import { isValidCategoryId } from "../services/id-validator";
+import { ErrorHandler } from "../services/ErrorService";
 
 export const create = async (
   req: Request,
@@ -55,13 +56,13 @@ export const single = async (
   try {
     const isValidId = await isValidCategoryId(String(id));
     if (!isValidId) {
-      throw new Error("Invalid category ID");
+      return new ErrorHandler("Invalid category ID", 400);
     }
 
     const category = await Category.findById(id);
 
     if (!category) {
-      throw new Error("Category not found");
+      return new ErrorHandler("Category not found", 404);
     }
 
     logger.info("Category fetched successfully");
@@ -82,13 +83,13 @@ export const deleteCategory = async (
   try {
     const isValidId = await isValidCategoryId(String(id));
     if (!isValidId) {
-      throw new Error("Invalid category ID");
+      return new ErrorHandler("Invalid category ID", 400);
     }
 
     const category = await Category.findByIdAndDelete(id);
 
     if (!category) {
-      throw new Error("Category not found");
+      return new ErrorHandler("Category not found", 404);
     }
 
     logger.info("Category deleted successfully");

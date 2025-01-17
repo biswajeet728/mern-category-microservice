@@ -1,5 +1,4 @@
 import { RequestHandler } from "express";
-import createHttpError from "http-errors";
 import {
   JsonWebTokenError,
   JwtPayload,
@@ -8,6 +7,7 @@ import {
 } from "jsonwebtoken";
 import { Config } from "../config";
 import { Roles } from "../services/userTypes";
+import { ErrorHandler } from "../services/ErrorService";
 
 declare global {
   namespace Express {
@@ -31,19 +31,21 @@ export const authenticate: RequestHandler = async (req, res, next) => {
     console.log("Token: ", token);
 
     if (!token) {
-      throw createHttpError(401, "Unauthorized: Access token is missing");
+      return next(
+        new ErrorHandler("Unauthorized: Access token is missing", 401)
+      );
     }
 
     const decoded = verify(token, Config.JWT_SECRET!);
     if (typeof decoded === "string") {
-      throw createHttpError(403, "Forbidden: Invalid access token");
+      return next(new ErrorHandler("Forbidden: Invalid access token", 403));
     }
     const payload: JwtPayload = decoded;
 
     console.log("Payload: ", payload);
 
     if (!payload) {
-      throw createHttpError(403, "Forbidden: Invalid access token");
+      return next(new ErrorHandler("Forbidden: Invalid access token", 403));
     }
 
     req.user = {
@@ -58,11 +60,13 @@ export const authenticate: RequestHandler = async (req, res, next) => {
   } catch (error) {
     console.log(error, "error");
     if (error instanceof TokenExpiredError) {
-      throw createHttpError(401, "Unauthorized: Access token has expired");
+      return next(
+        new ErrorHandler("Unauthorized: Access token has expired", 401)
+      );
     }
 
     if (error instanceof JsonWebTokenError) {
-      throw createHttpError(403, "Forbidden: Invalid access token");
+      return next(new ErrorHandler("Forbidden: Invalid access token", 403));
     }
 
     next(error);
@@ -71,7 +75,7 @@ export const authenticate: RequestHandler = async (req, res, next) => {
 
 export const adminOnly: RequestHandler = (req, res, next) => {
   if (req.user.role !== Roles.ADMIN) {
-    throw createHttpError(403, "Forbidden: Admin access required");
+    return next(new ErrorHandler("Forbidden: Admin access required", 403));
   }
 
   next();
