@@ -56,13 +56,13 @@ export const single = async (
   try {
     const isValidId = await isValidCategoryId(String(id));
     if (!isValidId) {
-      return new ErrorHandler("Invalid category ID", 400);
+      return next(new ErrorHandler("Invalid category ID", 400));
     }
 
     const category = await Category.findById(id);
 
     if (!category) {
-      return new ErrorHandler("Category not found", 404);
+      return next(new ErrorHandler("Category not found", 404));
     }
 
     logger.info("Category fetched successfully");
@@ -83,13 +83,13 @@ export const deleteCategory = async (
   try {
     const isValidId = await isValidCategoryId(String(id));
     if (!isValidId) {
-      return new ErrorHandler("Invalid category ID", 400);
+      return next(new ErrorHandler("Invalid category ID", 400));
     }
 
     const category = await Category.findByIdAndDelete(id);
 
     if (!category) {
-      return new ErrorHandler("Category not found", 404);
+      return next(new ErrorHandler("Category not found", 404));
     }
 
     logger.info("Category deleted successfully");
